@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -16,8 +18,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using WebAPITemplate.Options.JWT;
 using WebAPITemplate.Options.Swagger;
 
 namespace WebAPITemplate
@@ -35,6 +39,34 @@ namespace WebAPITemplate
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddNewtonsoftJson();
+
+            JWTSetting jwtSetting = new JWTSetting
+            {
+                Secret = Encoding.ASCII.GetBytes(Configuration.GetSection("JWT").GetSection("Secret").Value)
+            }; 
+            services.AddSingleton(jwtSetting);
+            services.AddAuthentication(x =>
+            {                
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                //x.SaveToken = true;
+                x.SaveToken = false; //unicon7 : 일단 Identity가 없으므로!
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+
+                    IssuerSigningKey = new SymmetricSecurityKey(jwtSetting.Secret)
+                };
+            });
+
             services.AddApiVersioning(
                options =>
                {
@@ -59,6 +91,24 @@ namespace WebAPITemplate
                     // add a custom operation filter which sets default values
                     options.OperationFilter<SwaggerDefaultValues>();
 
+                    var securityScheme = new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.ApiKey,
+                        BearerFormat = "JWT",
+                        Scheme = "bearer"
+                    };
+
+                    options.AddSecurityDefinition("Bearer", securityScheme);
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement 
+                    { 
+                        { 
+                            new OpenApiSecurityScheme { Reference = new OpenApiReference{ Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new string[] { } 
+                        } 
+                    });
+
                     // integrate xml comments
                     options.IncludeXmlComments(XmlCommentsFilePath);
                 });
@@ -77,8 +127,8 @@ namespace WebAPITemplate
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            //app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(builder =>
             {

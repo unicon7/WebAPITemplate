@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 namespace WebAPITemplate.Controllers.V3
 { 
     [ApiVersion("3")]
+    [ApiVersion("4")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class TestController : ControllerBase
@@ -17,6 +18,12 @@ namespace WebAPITemplate.Controllers.V3
         public string Get()
         {
             return "v3 안녕하세요!";
+        }
+
+        [HttpGet, MapToApiVersion("4")]
+        public string Get_V4()
+        {
+            return "v4 안녕하세요!";
         }
     }
 }
