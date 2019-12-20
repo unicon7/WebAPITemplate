@@ -26,28 +26,35 @@ namespace WebAPITemplate.Controllers.V1
         [HttpPost]
         public Object Post([FromBody]TokenReq tokenReq) 
         {
-            List<string> ErrorMessages = new List<string>();
-            ErrorMessages.Add("okokok");
-
-            // authentication successful so generate jwt token
-            var tokenHandler = new JwtSecurityTokenHandler();            
-            var tokenDescriptor = new SecurityTokenDescriptor
+            if (ModelState.IsValid)
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, tokenReq.Username)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_jwtSetting.Secret), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+                List<string> ErrorMessages = new List<string>();
+                ErrorMessages.Add("okokok");
 
-            return Ok(new {
-                tokenReq.Username,
-                tokenReq.Password,
-                Token = tokenHandler.WriteToken(token),
-                ErrorMessages
-            });
+                // authentication successful so generate jwt token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, tokenReq.Username)
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_jwtSetting.Secret), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                return Ok(new
+                {
+                    tokenReq.Username,
+                    tokenReq.Password,
+                    Token = tokenHandler.WriteToken(token),
+                    ErrorMessages
+                });
+            }
+
+            var errorMessage = ModelState.ToArray();
+            return new { errorMessage };
         }
     }
 }
