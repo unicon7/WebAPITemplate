@@ -60,8 +60,9 @@ namespace WebAPITemplate.Attributes
             return null;
         }
 
+        //unicon7: 여기서 아이디와 암호를 비교하던 뭘 하던 해라!
         private bool ValidatePassword(object propertyValue, object otherPropertyValue)
-        {
+        {            
             if (Equals(propertyValue, otherPropertyValue))
             {
                 return false;

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 namespace WebAPITemplate.Controllers.V1
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [ApiVersion("1")]    
+    [ApiVersion("1")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class TestController : ControllerBase

@@ -42,9 +42,11 @@ namespace WebAPITemplate
 
             JWTSetting jwtSetting = new JWTSetting
             {
-                Secret = Encoding.ASCII.GetBytes(Configuration.GetSection("JWT").GetSection("Secret").Value)
-            }; 
+                //Secret = Encoding.ASCII.GetBytes(Configuration.GetSection("JWT:Secret").Value)
+                Secret = Encoding.ASCII.GetBytes(Configuration["JWT:Secret"])
+            };
             services.AddSingleton(jwtSetting);
+
             services.AddAuthentication(x =>
             {                
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
