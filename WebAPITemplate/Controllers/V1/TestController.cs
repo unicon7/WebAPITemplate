@@ -21,9 +21,9 @@ namespace WebAPITemplate.Controllers.V1
         /// </summary>
         /// <remarks>xml comment를 출력하는 방법입니다.</remarks>
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
-            return "v1 안녕하세요!";
+            return new ObjectResult(new { Hello = "v1 안녕하세요!", Test = "이상하네요" });
         }        
     }
 }

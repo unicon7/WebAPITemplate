@@ -26,7 +26,7 @@ namespace WebAPITemplate.Controllers.V1
         }
 
         [HttpPost]
-        public Object Post([FromBody]TokenReq tokenReq) 
+        public IActionResult Post([FromBody]TokenReq tokenReq) 
         {
 
             List<string> ErrorMessages = new List<string>();
@@ -56,11 +56,11 @@ namespace WebAPITemplate.Controllers.V1
         }
 
         //[HttpPost]
-        //public Object Post([FromBody]RefreshTokenReq refreshTokenReq)
+        //public IActionResult Post([FromBody]RefreshTokenReq refreshTokenReq)
         //{
- 
+
         //    var principal = GetPrincipalFromExpiredToken(refreshTokenReq.Token);
-            
+
         //    //List<string> ErrorMessages = new List<string>();
         //    //ErrorMessages.Add("okokok");
 
@@ -110,7 +110,6 @@ namespace WebAPITemplate.Controllers.V1
 
         //unicon7 : GUIDs is not random
         [NonAction]
-
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];

@@ -14,9 +14,12 @@ namespace WebAPITemplate.Controllers.V2
     public class TestController : ControllerBase
     {
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
-            return "v2 안녕하세요!";
+            return new ObjectResult(new
+            {
+                Hello = "v2 안녕하세요."
+            });
         }
     }
 }
